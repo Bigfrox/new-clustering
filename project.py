@@ -163,7 +163,7 @@ def GetGroundTruth(input_file):
     #! same cluster가 아닌건 아예 딕셔너리에 없음.
     
     
-    return P_dict
+    return P_dict, ground_truth_list
 
 def EvaluationJaccard(C_dict,P_dict):
     SS = 0
@@ -327,12 +327,29 @@ def main():
 
     # * save to output file with size : nodes in a cluster
     output_to_file(output_filename, cluster)
-    P_dict = GetGroundTruth(groundtruth_file)
+    P_dict, ground_truth_list = GetGroundTruth(groundtruth_file)
     C_dict = MakeIncidentMatrix(output_filename)
     accuracy = EvaluationJaccard(C_dict,P_dict)
-
     print("accuracy : ",accuracy,"%")
-    print(len(similarity))
+
+    # * f-measure
+    f_score_list = list()
+    for X in cluster:
+        f_score = 0
+        for Y in ground_truth_list:
+            if not X.intersection(Y):
+                continue
+            recall = len(X.intersection(Y)) / len(Y)
+            precision = len(X.intersection(Y)) / len(X)
+            tmp = 2 * recall * precision / (recall+precision)
+            if tmp >= f_score:
+                f_score = tmp
+        f_score_list.append(f_score)
+
+    f_score_avg = sum(f_score_list) / len(f_score_list)
+    print("f-Score Average : ", f_score_avg)
+    
+    #print(len(similarity))
     plt.hist(similarity)
     plt.show()
 
