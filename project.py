@@ -348,6 +348,7 @@ def main():
 
     f_score_avg = sum(f_score_list) / len(f_score_list)
     print("f-Score Average : ", f_score_avg)
+    print("f-measure Accuracy : ", f_score_avg*100,"%")
     
     #print(len(similarity))
     plt.hist(similarity)
